@@ -1,27 +1,52 @@
 <template>
-  <nav v-if="pagerEnd > 0">
+  <nav v-if="pageEnd > 0">
     <ul class="pagination">
-      <li @click.prevent="setPage(currentPage - 1)" class="page-item">
+      <li
+        @click.prevent="$emit('setPageNum', currentPage - 1)"
+        class="page-item"
+      >
         <a class="page-link" href>Previous</a>
       </li>
 
       <li
-        v-for="i in pagerEnd"
-        :class="{ active: i + pagerAddAmount === currentPage }"
+        v-for="i in pageEnd"
+        :class="{ active: i + pageAddAmount === currentPage }"
         :key="i"
-        @click.prevent="setPage(i + pagerAddAmount)"
+        @click.prevent="$emit('setPageNum', i + pageAddAmount)"
         class="page-item"
       >
-        <a class="page-link" href>{{ i + pagerAddAmount }}</a>
+        <a class="page-link" href>{{ i + pageAddAmount }}</a>
       </li>
 
-      <li @click.prevent="setPage(currentPage + 1)" class="page-item">
+      <li
+        @click.prevent="$emit('setPageNum', currentPage + 1)"
+        class="page-item"
+      >
         <a class="page-link" href>Next</a>
       </li>
     </ul>
   </nav>
 </template>
 
-<script setup></script>
+<script setup>
+defineProps({
+  pageEnd: {
+    type: Number,
+  },
+  currentPage: {
+    type: Number,
+  },
+  pageAddAmount: {
+    type: Number,
+  },
+});
 
-<style scoped></style>
+defineEmits(["setPageNum"]);
+</script>
+
+<style scoped>
+.pagination {
+  display: flex;
+  justify-content: center;
+}
+</style>

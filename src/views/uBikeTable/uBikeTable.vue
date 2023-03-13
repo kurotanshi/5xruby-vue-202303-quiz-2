@@ -71,17 +71,17 @@ const totalPageCount = computed(() => {
   return Math.ceil(filtedUbikeStops.value.length / COUNT_OF_PAGE);
 });
 // 分頁的尾端
-const pagerEnd = computed(() => {
+const pageEnd = computed(() => {
   return totalPageCount.value <= PAGINATION_MAX
     ? totalPageCount.value
     : PAGINATION_MAX;
 });
 // 分頁的位移，用來確保目前的頁碼在中間
-const pagerAddAmount = computed(() => {
+const pageAddAmount = computed(() => {
   const tmp =
     totalPageCount.value <= PAGINATION_MAX
       ? 0
-      : currentPage.value + 4 - pagerEnd.value;
+      : currentPage.value + 4 - pageEnd.value;
   return tmp <= 0
     ? 0
     : totalPageCount.value - (PAGINATION_MAX + tmp) < 0
@@ -114,27 +114,12 @@ const setPage = (page) => {
   </div>
 
   <!-- 頁籤 -->
-  <nav v-if="pagerEnd > 0">
-    <ul class="pagination">
-      <li @click.prevent="setPage(currentPage - 1)" class="page-item">
-        <a class="page-link" href>Previous</a>
-      </li>
-
-      <li
-        v-for="i in pagerEnd"
-        :class="{ active: i + pagerAddAmount === currentPage }"
-        :key="i"
-        @click.prevent="setPage(i + pagerAddAmount)"
-        class="page-item"
-      >
-        <a class="page-link" href>{{ i + pagerAddAmount }}</a>
-      </li>
-
-      <li @click.prevent="setPage(currentPage + 1)" class="page-item">
-        <a class="page-link" href>Next</a>
-      </li>
-    </ul>
-  </nav>
+  <pagination
+    :page-end="pageEnd"
+    :current-page="currentPage"
+    :page-add-amount="pageAddAmount"
+    @set-page-num="(page) => setPage(page)"
+  />
 </template>
 
 <style lang="scss" scoped>
@@ -143,9 +128,5 @@ const setPage = (page) => {
 }
 .pointer {
   cursor: pointer;
-}
-.pagination {
-  display: flex;
-  justify-content: center;
 }
 </style>
