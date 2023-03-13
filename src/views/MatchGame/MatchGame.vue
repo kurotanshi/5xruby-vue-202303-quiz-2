@@ -27,6 +27,7 @@ const gameInit = () => {
   const numArr = [...new Array(16).keys()].map((i) => ++i);
   numArr.sort(() => Math.random() - 0.5);
   cards.value = numArr.map((d) => (d % 8) + 1);
+  second.value = 0;
   openedCard.value = [];
   pairedCards.value = [];
 };
@@ -37,7 +38,10 @@ const checkAllDone = () => {
     setRecord(second.value);
     Swal.fire({
       title: "恭喜破關，再來一局？",
-      text: "",
+      text:
+        record.value !== 0 && second.value < record.value
+          ? `進步了 ${record.value - second.value} 秒，太厲害了！`
+          : `這次花費了 ${second.value} 秒！`,
       icon: "success",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -45,6 +49,7 @@ const checkAllDone = () => {
       confirmButtonText: "確定",
     }).then((result) => {
       if (result.isConfirmed) {
+        second.value = 0;
         gameInit();
         loadRecord();
       }
@@ -94,7 +99,6 @@ const setRecord = (time) => {
 
 watch(isGameStarted, (start) => {
   if (start) {
-    second.value = 0;
     timer.value = window.setInterval(() => {
       second.value += 1;
     }, 1000);
