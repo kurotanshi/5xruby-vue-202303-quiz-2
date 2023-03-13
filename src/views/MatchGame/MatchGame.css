@@ -1,4 +1,3 @@
-
 .flip-card {
   display: block;
   width: 150px;
@@ -34,14 +33,14 @@
 
 .flip-card-front {
   background-color: #eee;
-  background-image: url('./img/cat-bg.png');
+  background-image: url("./img/cat-bg.png");
   background-size: contain;
   background-repeat: no-repeat;
   background-position-x: 47.5%;
   color: black;
 }
 
-.flip-card-back {      
+.flip-card-back {
   background-color: #eee;
   transform: rotateY(180deg);
 }
