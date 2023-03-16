@@ -1,5 +1,5 @@
 <script setup>
-import myCard from "./components/myCard.vue";
+import Card from "./components/Card.vue";
 import { ref, watch } from "vue";
 
 // 試完成以下功能：
@@ -18,6 +18,24 @@ const gameInit = () => {
   const numArr = [...new Array(16).keys()].map((i) => ++i);
   numArr.sort(() => Math.random() - 0.5);
   cards.value = numArr.map((d) => (d % 8) + 1);
+  cards.value = [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+  ];
   openedCard.value = [];
   hasMatchCard.value = [];
   recordCard.value = [];
@@ -46,13 +64,15 @@ const clickHandler = (idx, n) => {
 
 watch(
   hasMatchCard,
-  (val) => {
+  () => {
     if (hasMatchCard.value.length === 8) {
-      let yes = confirm("恭喜通關，要再來一局嗎？");
-
-      if (yes) {
-        gameInit();
-      }
+      openedCard.value = [];
+      window.setTimeout(() => {
+        let yes = confirm("恭喜通關，要再來一局嗎？");
+        if (yes) {
+          gameInit();
+        }
+      }, 800);
     }
   },
   { deep: true }
@@ -84,7 +104,11 @@ watch(
         }"
         @click="clickHandler(idx, n)"
       >
-        <myCard :hasMatchCard="hasMatchCard" :n="n" />
+        <Card
+          v-if="!hasMatchCard.includes(n)"
+          :hasMatchCard="hasMatchCard"
+          :src="`./img/cat-0${n}.jpg`"
+        />
       </div>
     </div>
   </div>
