@@ -1,16 +1,7 @@
 <script setup>
 let props = defineProps({
-  cards: {
-    type: Array,
-  },
   hasMatchCard: {
     type: Array,
-  },
-  openedCard: {
-    type: Array,
-  },
-  clickHandler: {
-    type: Function,
   },
   n: {
     type: Number,
