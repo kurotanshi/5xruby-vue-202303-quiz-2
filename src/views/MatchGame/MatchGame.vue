@@ -1,5 +1,7 @@
 <script setup>
-import { ref } from 'vue';
+import { ref , watch , computed } from 'vue';
+import Card from './component/Card.vue';
+import Modal from './component/Modal.vue';
 
 // 試完成以下功能：
 //  1. 點擊卡片，卡片會翻開 (已完成)
@@ -11,52 +13,113 @@ import { ref } from 'vue';
 const cards = ref([]);
 const openedCard = ref([]);
 
+const isGameStart = ref(false)
+const isGameWin = ref(false)
+const timer = ref(60)
+
+const isModalVisible = ref(false)
+
+
 // 遊戲初始化，洗牌
 const gameInit = () => {
   const numArr = [...new Array(16).keys()].map(i => ++i);
   numArr.sort(() => Math.random() - 0.5);
   cards.value = numArr.map(d => (d % 8) + 1);
   openedCard.value = [];
+  isGameStart.value = true
+  isGameWin.value = false
+  timer.value = 60
 }
 
-const clickHandler = (idx) => {    
+const clickHandler = (idx) => {
+  // 第一次點擊    
+  if(!openedCard.value.length) return openedCard.value.push(idx);
+
+  // 第二次點擊
+  const idx0 = openedCard.value[0]
   openedCard.value.push(idx);
-  
-  // 一秒後將 openedCard 清空 (牌面覆蓋回去)
-  window.setTimeout(() => {
-    openedCard.value = [];
-  }, 1000);
+  if(cards.value[idx0] === cards.value[idx] && idx0 !== idx ){
+    // 一秒後照片隱藏 openedCard 清空 (牌面覆蓋回去)
+    window.setTimeout(() => {
+      cards.value.splice(idx, 1, -1)
+      cards.value.splice(idx0, 1, -1)
+      openedCard.value = [];
+
+      // 當遊戲結束時 跳視窗
+      if(cards.value.every(n => n < 0)) modalOpen('win')
+    }, 1000);
+ 
+  }else{
+    // 一秒後將 openedCard 清空 (牌面覆蓋回去)
+    window.setTimeout(() => {
+      openedCard.value = [];
+    }, 1000);
+  }
 }
+
+// modal
+const modalOpen = (res) => {
+  isModalVisible.value = true
+  switch(res) {
+    case 'win':
+      isGameWin.value = true
+      break;
+      
+    case 'fail':
+      isGameWin.value = false
+      break;
+
+    default:
+      isGameWin.value = false
+      break;
+  }
+  isGameStart.value = false
+}
+
+const isGameRestart = (boolean) => {
+  isModalVisible.value = false
+  if(boolean) gameInit()
+}
+
+// 倒數計時器
+const setTimes = setInterval( ()=>{
+  if( isGameStart.value ) timeCountDown()
+}, 1000);
+
+const timeCountDown = () => {
+  // 時間到結束遊戲
+  !timer.value && isGameStart.value
+  ? modalOpen('fail')
+  : timer.value --
+}
+
 </script>
 
 <template>
-  <div class="bg-emerald-900 h-[100vh] w-full top-0 left-0 z-10 absolute">
+  <div class="bg-emerald-900 w-full top-0 left-0 z-10 absolute">
 
     <div class="my-10 text-white text-center ">
       <div class="mb-8 text-5xl">五倍對對碰</div>
+
+      <!-- timer-->
+      <div class="my-4 mb-8 text-2xl text-center text-white"> 倒數 {{ timer }} 秒 </div>
+
       <button 
         @click="gameInit"
-        class="rounded font-bold bg-blue-500 mx-6 text-white py-2 px-4 hover:bg-blue-700">開始</button>
+        class="rounded font-bold bg-blue-500 mx-6 text-white py-2 px-4 hover:bg-blue-700">{{ isGameStart ? '重置' : '開始' }}</button>
     </div>
 
-    <div class="rounded-xl mx-auto border-4 mt-12 grid grid-flow-col p-10 w-[900px] gap-2 grid-rows-4">
-      
-      <div 
-        v-for="(n, idx) in cards"
-        class="flip-card"
-        :class="{
-          'open': openedCard.includes(idx)
-        }"
-        @click="clickHandler(idx)">
-        <div class="flip-card-inner" v-if="cards[idx] > 0">
-          <div class="flip-card-front"></div>
-          <div class="flip-card-back">
-            <img :src="`./img/cat-0${n}.jpg`" alt="">
-          </div>
-        </div>
-      </div>
+      <Card 
+        :cards="cards" 
+        :openedCard="openedCard"
+        @updateClickInfo="clickHandler"
+        />
+      <Modal
+        :isModalVisible="isModalVisible"
+        :isGameWin="isGameWin"
+        @isGameRestart="isGameRestart"
+        />
 
-    </div>
   </div>
 </template>
 
