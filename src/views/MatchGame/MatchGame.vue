@@ -1,5 +1,6 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
+import Card from './components/Card.vue';
 
 // 試完成以下功能：
 //  1. 點擊卡片，卡片會翻開 (已完成)
@@ -19,14 +20,16 @@ const gameInit = () => {
   openedCard.value = [];
 }
 
-const clickHandler = (idx) => {    
-  openedCard.value.push(idx);
-  
-  // 一秒後將 openedCard 清空 (牌面覆蓋回去)
-  window.setTimeout(() => {
-    openedCard.value = [];
-  }, 1000);
-}
+// 當所有卡片都消失時，顯示「恭喜破關，再來一局？」的對話框，按下確定後重置遊戲
+watch(()=>cards, (newVal) => {
+  console.log(newVal);
+  if (newVal.value.every(d => d === 0)) {
+    const isAgain = confirm('恭喜破關，再來一局？');
+    if (isAgain) {
+      gameInit();
+    }
+  }
+}, { deep: true });
 </script>
 
 <template>
@@ -41,20 +44,15 @@ const clickHandler = (idx) => {
 
     <div class="rounded-xl mx-auto border-4 mt-12 grid grid-flow-col p-10 w-[900px] gap-2 grid-rows-4">
       
-      <div 
-        v-for="(n, idx) in cards"
-        class="flip-card"
-        :class="{
-          'open': openedCard.includes(idx)
-        }"
-        @click="clickHandler(idx)">
-        <div class="flip-card-inner" v-if="cards[idx] > 0">
-          <div class="flip-card-front"></div>
-          <div class="flip-card-back">
-            <img :src="`./img/cat-0${n}.jpg`" alt="">
-          </div>
-        </div>
-      </div>
+      <template  v-for="(n, idx) in cards" :key="idx">
+        <Card 
+          :idx="idx"
+          :n="n"
+          v-model:openedCard="openedCard"
+          v-model:cards="cards"
+        />
+      </template>
+
 
     </div>
   </div>
