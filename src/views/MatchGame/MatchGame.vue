@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
 // 試完成以下功能：
 //  1. 點擊卡片，卡片會翻開 (已完成)
@@ -10,6 +10,7 @@ import { ref } from 'vue';
 
 const cards = ref([]);
 const openedCard = ref([]);
+const jumpWindow = ref(false);
 
 // 遊戲初始化，洗牌
 const gameInit = () => {
@@ -18,6 +19,12 @@ const gameInit = () => {
   cards.value = numArr.map(d => (d % 8) + 1); //1~16的array(陣列)裡面每個數字 d除8 取餘數 (%=取餘數的運算子) 變成0~7 再+1
   openedCard.value = [];
 }
+
+watch(() => cards.value, () => {
+    if (cards.value.every(c => c == 0)) {
+        jumpWindow.value = true;
+    }
+}, {deep: true});
 
 const clickHandler = (idx) => {
   const hendCard = cards.value[idx] === 0
@@ -48,7 +55,8 @@ const clickHandler = (idx) => {
 <template>
   <div class="bg-emerald-900 h-[100vh] w-full top-0 left-0 z-10 absolute">
 
-    <div class="relative max-w-full w-[400px] border-4 rounded-md border-double border-amber-600 m-auto bg-white p-5 mt-5" v-show="hendCard">
+    <div class="relative max-w-full w-[400px] border-4 rounded-md border-double border-amber-600 m-auto bg-white p-5 mt-5"
+         v-show="jumpWindow">
       <div class="text-center text-2xl mb-4 font-bold">恭喜破關，要不要再來一局?</div>
       <div class="text-center text-xl">
         <button class="choose pr-5" @click="yupCard = true">要</button>
