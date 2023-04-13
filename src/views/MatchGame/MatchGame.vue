@@ -24,7 +24,16 @@ watch(() => cards.value, () => {
     if (cards.value.every(c => c == 0)) {
         jumpWindow.value = true;
     }
-}, {deep: true});
+}, {deep: true});//監聽遊戲結束 跳出視窗
+
+const yupCard = () => {
+  gameInit();
+  jumpWindow.value = false;
+}; //按下button"是" 遊戲初始化 同時關閉跳窗
+
+const notCard = () => {
+  jumpWindow.value = false;
+}; //按下button"不是" 關閉跳窗
 
 const clickHandler = (idx) => {
   const hendCard = cards.value[idx] === 0
@@ -59,8 +68,8 @@ const clickHandler = (idx) => {
          v-show="jumpWindow">
       <div class="text-center text-2xl mb-4 font-bold">恭喜破關，要不要再來一局?</div>
       <div class="text-center text-xl">
-        <button class="choose pr-5" @click="yupCard = true">要</button>
-        <button class="choose" @click="hendCard = false">不要</button>
+        <button class="choose pr-5" @click="yupCard">要</button>
+        <button class="choose" @click="notCard">不要</button>
       </div>
     </div>
 
@@ -82,7 +91,7 @@ const clickHandler = (idx) => {
         }"
         @click="clickHandler(idx)">
         <div class="flip-card-inner" v-if="cards[idx] > 0">
-          <div class="flip-card-front"></div>
+          <div class="flip-card-front">{{ n }}</div>
           <div class="flip-card-back">
             <img :src="`./img/cat-0${n}.jpg`" alt="">
           </div>
